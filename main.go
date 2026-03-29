@@ -3,6 +3,7 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"log"
 	"os"
 )
 
@@ -18,8 +19,14 @@ func main() {
 	const filename = "tasks.json"
 	// scanner := bufio.NewScanner(os.Stdin)
 
-	fmt.Println(loadTasks(filename))
+	taskList := loadTasks(filename)
 
+	fmt.Println(taskList)
+	taskList = addTask(taskList, "Buy wallpapers")
+
+	saveTasks(taskList, filename)
+
+	listTasks(taskList)
 	for {
 		break
 	}
@@ -38,17 +45,38 @@ func loadTasks(filename string) []task {
 
 // Add
 func addTask(tasks []task, name string) []task {
-
-	return []task{}
+	newId := len(tasks) + 1
+	newTask := task{ID: newId, Task: name, Done: false}
+	return append(tasks, newTask)
 }
 
 // List
 func listTasks(task []task) {
+	for i := 0; i < len(task); i++ {
+		mark := "[ ]"
+		if task[i].Done == true {
+			mark = "[✔]"
+		}
+		fmt.Printf("%v. %s %s\n", task[i].ID, mark, task[i].Task)
+	}
+}
 
+// Save tasks
+func saveTasks(tasks []task, filename string) {
+	file, err := os.Create(filename)
+	if err != nil {
+		log.Fatal(err)
+	}
+	encoder := json.NewEncoder(file)
+	encoder.SetIndent("", "  ")
+	encoder.Encode(tasks)
 }
 
 // Delete
 
 // Mark done and no
+func markDone(tasks []task, id int) {
+
+}
 
 // k

@@ -37,6 +37,7 @@ func main() {
 	fmt.Println("3 - Delete task")
 	fmt.Println("4 - Mark done")
 	fmt.Println("5 - Unmark")
+	fmt.Println("6 - Change task")
 	fmt.Println("0, ENTER - Exit")
 	fmt.Println("help or 9 - to do menu")
 	fmt.Println(" ")
@@ -104,6 +105,19 @@ func main() {
 			}
 			tasks = unMarkDone(tasks, unMarkID)
 			saveTasks(tasks, filename)
+		case "6":
+			fmt.Print("Type id of a task: ")
+			if ok := scanner.Scan(); !ok {
+				fmt.Println("Empty input, reload")
+				continue
+			}
+			changeTaskID, err := strconv.Atoi(scanner.Text())
+			if err != nil {
+				fmt.Println("Failed to convert input into integer!")
+				continue
+			}
+			tasks = changeTask(tasks, changeTaskID)
+			saveTasks(tasks, filename)
 		case "0":
 			saveTasks(tasks, filename)
 			fmt.Println("Saving file and exiting..")
@@ -115,6 +129,7 @@ func main() {
 			fmt.Println("3 - Delete task")
 			fmt.Println("4 - Mark done")
 			fmt.Println("5 - Unmark")
+			fmt.Println("6 - Change task")
 			fmt.Println("0 - Exit")
 			fmt.Println("help or 9 - to do menu")
 		default:
@@ -197,7 +212,7 @@ func markDone(tasks []task, id int) []task {
 			return tasks
 		}
 	}
-	fmt.Printf("%v not founded.", id)
+	fmt.Printf("Task id:%v not founded. \n", id)
 	return tasks
 }
 func unMarkDone(tasks []task, id int) []task {
@@ -207,8 +222,26 @@ func unMarkDone(tasks []task, id int) []task {
 			return tasks
 		}
 	}
-	fmt.Printf("%v not founded.", id)
+	fmt.Printf("Task id: %v not founded. \n", id)
 	return tasks
 }
 
-// k
+// Change task
+
+func changeTask(tasks []task, id int) []task {
+	scanner := bufio.NewScanner(os.Stdin)
+	for i := range tasks {
+		if tasks[i].ID == id {
+			fmt.Print("Type changed task: ")
+			if ok := scanner.Scan(); !ok {
+				fmt.Println("Empty input, reload..")
+				continue
+			}
+			newTask := scanner.Text()
+			tasks[i].Task = newTask
+			return tasks
+		}
+	}
+	fmt.Printf("Task id: %v not founded. \n", id)
+	return tasks
+}

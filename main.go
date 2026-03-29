@@ -131,7 +131,11 @@ func loadTasks(filename string) []task {
 		return []task{}
 	}
 	var tasks []task
-	json.Unmarshal(file, &tasks)
+	err = json.Unmarshal(file, &tasks)
+	if err != nil {
+		// So it's broken or empty
+		return []task{}
+	}
 	return tasks
 }
 
@@ -144,6 +148,10 @@ func addTask(tasks []task, name string) []task {
 
 // List
 func listTasks(tasks []task) {
+	if len(tasks) == 0 {
+		fmt.Println("No tasks yet")
+		return
+	}
 	for i := 0; i < len(tasks); i++ {
 		mark := "[ ]"
 		if tasks[i].Done == true {
@@ -159,6 +167,8 @@ func saveTasks(tasks []task, filename string) {
 	if err != nil {
 		log.Fatal(err)
 	}
+	defer file.Close()
+
 	encoder := json.NewEncoder(file)
 	encoder.SetIndent("", "  ")
 	encoder.Encode(tasks)
@@ -168,14 +178,14 @@ func saveTasks(tasks []task, filename string) {
 func deleteTask(tasks []task, id int) []task {
 	for i, t := range tasks {
 		if t.ID == id {
-			tasks := append(tasks[:i], tasks[:i+1]...)
+			tasks := append(tasks[:i], tasks[i+1:]...)
 			for j := range tasks {
 				tasks[j].ID = j + 1
 			}
 			return tasks
 		}
 	}
-	fmt.Printf("Not finded task %v.\n", id)
+	fmt.Printf("Not fonded task %v.\n", id)
 	return tasks
 }
 
